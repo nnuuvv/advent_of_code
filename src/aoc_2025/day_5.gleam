@@ -55,5 +55,48 @@ pub fn pt_1(input: #(List(#(Int, Int)), List(Int))) {
 }
 
 pub fn pt_2(input: #(List(#(Int, Int)), List(Int))) {
-  todo as "part 2 not implemented"
+  let #(ranges, _) = input
+
+  let sum =
+    ranges
+    // |> echo
+    |> list.fold([], fn(processed, range) { pt_2_loop(range, processed, []) })
+    |> list.fold(0, fn(sum, range) {
+      case range {
+        #(0, 0) -> sum
+        #(start, end) -> {
+          sum + { { end - start } + 1 }
+        }
+      }
+    })
+
+  sum
+}
+
+pub fn pt_2_loop(range, processed_ranges: List(#(Int, Int)), acc) {
+  let #(start, end) = range
+
+  case processed_ranges {
+    // we've gone through all of them
+    // add range to acc for next round of processing
+    [] -> [range, ..acc]
+    // fully fits into a different range, we are done
+    [p_range, ..rest] if p_range.0 <= start && p_range.1 >= end ->
+      list.append([p_range, ..acc], rest)
+
+    // already processed one fits fully 
+    [p_range, ..rest] if p_range.0 >= start && p_range.1 <= end ->
+      pt_2_loop(range, rest, acc)
+
+    // merge at front
+    [#(p_start, p_end), ..rest] if start >= p_start && start <= p_end ->
+      pt_2_loop(#(p_start, end), rest, acc)
+
+    // merge at end
+    [#(p_start, p_end), ..rest] if end >= p_start && end <= p_end ->
+      pt_2_loop(#(start, p_end), rest, acc)
+
+    // keep the unmatched
+    [unmatched, ..rest] -> pt_2_loop(range, rest, [unmatched, ..acc])
+  }
 }

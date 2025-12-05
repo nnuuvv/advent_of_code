@@ -37,24 +37,36 @@ fn can_access(warehouse, coord, storage) {
     Empty -> False
     Roll -> {
       let #(row, column) = coord
+
+      // top row
       let top_left =
-        dict.get(warehouse, #(row - 1, column - 1)) |> result.unwrap(Empty)
+        dict.get(warehouse, #(row - 1, column - 1))
+        |> result.unwrap(Empty)
       let top_middle =
-        dict.get(warehouse, #(row - 1, column)) |> result.unwrap(Empty)
+        dict.get(warehouse, #(row - 1, column))
+        |> result.unwrap(Empty)
       let top_right =
-        dict.get(warehouse, #(row - 1, column + 1)) |> result.unwrap(Empty)
+        dict.get(warehouse, #(row - 1, column + 1))
+        |> result.unwrap(Empty)
 
+      // both sides
       let left_middle =
-        dict.get(warehouse, #(row, column - 1)) |> result.unwrap(Empty)
+        dict.get(warehouse, #(row, column - 1))
+        |> result.unwrap(Empty)
       let right_middle =
-        dict.get(warehouse, #(row, column + 1)) |> result.unwrap(Empty)
+        dict.get(warehouse, #(row, column + 1))
+        |> result.unwrap(Empty)
 
+      // bottom row
       let bottom_left =
-        dict.get(warehouse, #(row + 1, column - 1)) |> result.unwrap(Empty)
+        dict.get(warehouse, #(row + 1, column - 1))
+        |> result.unwrap(Empty)
       let bottom_middle =
-        dict.get(warehouse, #(row + 1, column)) |> result.unwrap(Empty)
+        dict.get(warehouse, #(row + 1, column))
+        |> result.unwrap(Empty)
       let bottom_right =
-        dict.get(warehouse, #(row + 1, column + 1)) |> result.unwrap(Empty)
+        dict.get(warehouse, #(row + 1, column + 1))
+        |> result.unwrap(Empty)
 
       [
         top_left,

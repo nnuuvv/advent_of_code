@@ -2,7 +2,6 @@ import gleam/int
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/pair
-import gleam/result
 import gleam/string
 
 pub type Problem {
@@ -49,41 +48,16 @@ pub fn pt_1(input: String) {
 }
 
 pub fn pt_2(input: String) {
-  let row =
-    input
-    // get rows
-    |> string.split("\n")
+  let rows = string.split(input, "\n")
 
-  let assert [first_row, ..] = row
-
-  let grapheme_rows =
-    row
-    |> list.flat_map(string.to_graphemes)
-    |> list.sized_chunk(string.length(first_row))
-
-  let assert Ok(operator_row) = list.last(grapheme_rows) as "invalid input"
-
-  let problem_count =
-    operator_row
-    |> list.filter(fn(item) { item != " " })
-    |> list.length()
-
-  // echo first_row as "first_row"
-
-  let interleaved =
-    grapheme_rows
-    // |> echo
-    |> list.interleave()
-  let row_count = list.length(grapheme_rows)
-
-  let problems =
-    parse_problems_by_column(interleaved, row_count, new_problem(), [])
-  // |> echo
-
-  echo list.length(problems) as "problems"
-  echo problem_count as "problem_count"
-
-  problems
+  rows
+  // turn rows into graphemes
+  |> list.map(string.to_graphemes)
+  // interleave them to have a long list of effectively [int, operator, int, int, empty column]
+  |> list.interleave()
+  // parse them by column into Problem(List(Int), Operator)
+  |> parse_problems_by_column(list.length(rows), new_problem(), [])
+  // solve them
   |> solve_problems()
 }
 

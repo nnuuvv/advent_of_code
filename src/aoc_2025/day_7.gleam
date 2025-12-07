@@ -1,15 +1,20 @@
 import gleam/dict
 import gleam/list
+import gleam/option.{None, Some}
 import gleam/pair
 import gleam/set
 import gleam/string
 
-pub fn pt_1(input: String) {
+pub fn parse(input: String) -> List(List(String)) {
   input
   // rows
   |> string.split("\n")
   // rows as chars
   |> list.map(string.to_graphemes)
+}
+
+pub fn pt_1(input: List(List(String))) {
+  input
   |> list.fold(#(0, set.new()), fn(acc, row) {
     let #(split_sum, columns_with_beam) = acc
 
@@ -42,6 +47,51 @@ pub fn pt_1(input: String) {
   |> pair.first()
 }
 
-pub fn pt_2(input: String) {
-  todo as "part 2 not implemented"
+pub fn pt_2(input: List(List(String))) {
+  input
+  |> list.fold(dict.new(), fn(columns_with_beam, row) {
+    let columns_with_beam =
+      list.index_fold(
+        row,
+        columns_with_beam,
+        fn(columns_with_beam, item, column) {
+          case item {
+            "S" -> columns_with_beam |> dict.upsert(column, add(_, 1))
+            "^" -> {
+              case dict.get(columns_with_beam, column) {
+                Ok(count) if count > 0 -> {
+                  // echo count
+                  let columns_with_beam =
+                    columns_with_beam
+                    |> dict.delete(column)
+                    |> dict.upsert(column - 1, add(_, count))
+                    |> dict.upsert(column + 1, add(_, count))
+
+                  columns_with_beam
+                }
+
+                _ -> columns_with_beam
+              }
+            }
+            // "."
+            _ -> columns_with_beam
+          }
+        },
+      )
+
+    columns_with_beam
+  })
+  |> dict.fold(0, fn(acc, _key, value) { acc + value })
+}
+
+fn add(item: option.Option(Int), amount) -> Int {
+  let amount = case item {
+    Some(count) -> count + amount
+    None -> amount
+  }
+
+  case amount {
+    amount if amount < 0 -> 0
+    _ -> amount
+  }
 }
